@@ -1,0 +1,1 @@
+python addmva.py --inputfile '/nfs/lhcb/malexander01/charm/baryon-lifetimes-2015/data/run-II-data/turbo_2015_data_wAngles.root' --inputtree 'DecayTree' --outputfile 'mva.root' --outputtree 'WeightsTree' --weightsfile '/afs/phas.gla.ac.uk/user/g/gsarpis/lambdaC/weights/TMVAClassification_BDTG.weights.xml' --weightsvar BDTG #--maxentries 100
