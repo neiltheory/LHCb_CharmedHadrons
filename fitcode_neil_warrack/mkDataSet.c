@@ -16,10 +16,14 @@ void mkfunc() {
   // Write .root dataset file from TTree 
 
   TFile *file_01 = TFile::Open("~/Documents/uni/LHCb_CharmSummerProj/data/turbo_2015_data.root");
+  //TFile *file_01 = TFile::Open("/afs/phas.gla.ac.uk/user/n/nwarrack/public_ppe/myLHCb/Gedcode/LHCb_CharmedHadrons/data/turbo_2015_data.root") ;
+
   TTree* mytree = (TTree*) file_01->Get("Lambda_cToKppiTuple/DecayTree;1");
   RooRealVar Lambda_cplus_TAU("Lambda_cplus_TAU","Lambda_cplus_TAU",-0.002,0.005);
   RooDataSet ds("ds","ds",RooArgSet(Lambda_cplus_TAU),Import(*mytree)) ;
-  TFile *datafile = TFile::Open("~/Documents/uni/LHCb_CharmSummerProj/learning_root/RooFit/firstTry/datafileLambda_TAUminNeg002_max005.root","recreate");
+  // Choose destination, and name appropriately.
+  //TFile *datafile = TFile::Open("~/Documents/uni/LHCb_CharmSummerProj/learning_root/RooFit/firstTry/datafileLambda_TAUminNeg002_max005.root","recreate");
+  //TFile *datafile = TFile::Open("/afs/phas.gla.ac.uk/user/n/nwarrack/public_ppe/myLHCb/Gedcode/LHCb_CharmedHadrons/fircode_neil_warrack/outputfile.root") ;
   ds.Write() ;
   datafile->Close(); 
  
