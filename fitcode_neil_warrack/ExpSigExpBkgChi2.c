@@ -75,8 +75,8 @@ void fitfunc() {
    RooRealVar expoPar1("expoPar1","expoPar1", -5000, -5000000., 0.);
    RooExponential expo1("expo1", "expo1", Lambda_cplus_TAU, expoPar1);
 
-   //RooRealVar expoPar2("expoPar2","expoPar2", -0.00001, -5., 0.);
-   //RooExponential expo2("expo2", "expo2", Lambda_cplus_TAU, expoPar2);
+   RooRealVar expoPar2("expoPar2","expoPar2", -0.00001, -50000000000., 0.);
+   RooExponential expo2("expo2", "expo2", Lambda_cplus_TAU, expoPar2);
 
    // Define signal & background coeffs
    RooRealVar nSignal("nSignal","nSignal", 10, 0, 1420336);
@@ -86,14 +86,14 @@ void fitfunc() {
    //RooAddPdf model("model","model",RooArgList(gauss, pol0),RooArgList(nSignal, pol0_yield));
    //RooAddPdf model("model","model",RooArgList(gauss, expo_bkg),RooArgList(nSignal, nBkg));
    //RooAddPdf model("model","model",RooArgList(gaussCom, expo_bkg),RooArgList(nSignal, nBkg));
-   //RooAddPdf model("model","model",RooArgList(expo1, expo2),RooArgList(nSignal, nBkg));
+   RooAddPdf model("model","model",RooArgList(expo1, expo2),RooArgList(nSignal, nBkg));
    
    
    
    Lambda_cplus_TAU.setRange("R1",0.00018, 0.0012);
    // Fit model
-   //model.fitTo(*ds, Range("R1"));
-    expo1.fitTo(*ds, Range("R1"));
+   model.fitTo(*ds, Range("R1"));
+   //expo1.fitTo(*ds, Range("R1"));
    //model.fitTo(*ds) ;
    //RooFitResult* rmodel = model.fitTo(*ds,Save()) ;
    //RooFitResult* rexpo_bkg = expo_bkg.fitTo(*ds,Save());
@@ -104,9 +104,9 @@ void fitfunc() {
    //ds.plotOn(frame,Binning(25)); //default is 100 bins
    ds->plotOn(Lambda_cplus_TAUframe, Name("data"), MarkerColor(kBlack)) ;
    ds->statOn(Lambda_cplus_TAUframe, Layout(0.65,0.88,0.2), What("N")) ; //NB Layout(xmin,xmax,ymax) 
-   expo1.plotOn(Lambda_cplus_TAUframe, Name("Model"), DrawOption("L")) ;
-   //model.plotOn(Lambda_cplus_TAUframe, Components(expo_bkg), LineStyle(kDashed)) ;
-   expo1.paramOn(Lambda_cplus_TAUframe,Layout(0.19, 0.45, 0.88)) ; //was 0.4
+   model.plotOn(Lambda_cplus_TAUframe, Name("Model"), DrawOption("L")) ;
+   model.plotOn(Lambda_cplus_TAUframe, Components(expo2), LineStyle(kDashed)) ;
+   model.paramOn(Lambda_cplus_TAUframe,Layout(0.19, 0.45, 0.88)) ; //was 0.4
    Lambda_cplus_TAUframe->getAttText()->SetTextSize(0.022) ; 
 
    RooDataHist hist("hist","hist", RooArgSet(Lambda_cplus_TAU), *ds) ;
@@ -126,10 +126,11 @@ void fitfunc() {
    // Draw on Canvas   
    TCanvas *c1 = new TCanvas("c1","canvas_name",700,500);
    c1->cd(1) ; 
+   //c1->SetLogy() ;
    gPad->SetLeftMargin(0.15) ; 
    Lambda_cplus_TAUframe->GetYaxis()->SetTitleOffset(1.4) ; 
    Lambda_cplus_TAUframe->Draw() ;
-   c1->SaveAs("ExpSigExpBkgTAUFit.eps");
+   c1->SaveAs("ExpSigExpBkgTAUFit_NoLog.eps");
 
    // create canvas
    //TCanvas *c1 = new TCanvas("c1","canvas_name",10,10,700,500) ;
