@@ -24,15 +24,15 @@ using namespace RooFit ;
 void binning() {
 
   TFile *datafile = TFile::Open("~/Documents/uni/LHCb_CharmSummerProj/Gedcode/baryon-lifetimes-2015/data/run-II-data/datafileLambda_TAUmin200fs_max2200fs.root"); // Open "dataset" .root file (made using mkDataSet.c script).
-  cout<<"mark1"<<endl;
+
   RooDataSet* ds = (RooDataSet*)datafile->Get("ds") ;
-   cout<<"mark2"<<endl;
+
   // Define x-axis variable, get limits.
   RooRealVar Lambda_cplus_TAU("Lambda_cplus_TAU","Lambda_cplus_TAU",0.0002 ,0.0022 ,"ns") ;  
   double highest;
   double lowest;
   ds->RooAbsData::getRange(Lambda_cplus_TAU, lowest, highest);
-    cout<<"mark3"<<endl;
+
   //Lambda_cplus_TAU.setRange("R1",0.00018, 0.0012);
    
    // Fit model
@@ -46,47 +46,41 @@ void binning() {
    // Plot
    //RooPlot *Lambda_cplus_TAUframe = Lambda_cplus_TAU.frame(Title("-Title-"));
   int nBins ;
- cout<<"mark4"<<endl;
   nBins = 10 ;
- cout<<"mark5"<<endl;
   RooPlot *Lambda_cplus_TAUframe = new RooPlot("Lambda_cplus_TAUframe","Lambda_cplus_TAUframe", Lambda_cplus_TAU, 0.00025, 0.002, nBins) ; 
- cout<<"mark6"<<endl;  
-//ds.plotOn(frame,Binning(10)); //default is 100 bins
-   ds->plotOn(Lambda_cplus_TAUframe, Name("data"), MarkerColor(kBlack)) ;
- cout<<"mark7"<<endl; 
+
+  //ds.plotOn(frame,Binning(10)); //default is 100 bins
+  ds->plotOn(Lambda_cplus_TAUframe, Name("data"), MarkerColor(kBlack)) ;
+
   //ds->statOn(Lambda_cplus_TAUframe, Layout(0.65,0.88,0.2), What("N")) ; //NB Layout(xmin,xmax,ymax) 
-   //model.plotOn(Lambda_cplus_TAUframe, Name("Model"), DrawOption("L")) ;
-   //model.plotOn(Lambda_cplus_TAUframe, Components(expo2), LineStyle(kDashed)) ;
-   //model.paramOn(Lambda_cplus_TAUframe,Layout(0.19, 0.45, 0.88)) ; //was 0.4
-   //Lambda_cplus_TAUframe->getAttText()->SetTextSize(0.022) ; 
-
-   //RooDataHist hist("hist","hist", RooArgSet(Lambda_cplus_TAU), *ds) ;
-   //Double_t chi2 = Lambda_cplus_TAUframe->chiSquare("Model","data",2) ;
-   //t1->Draw();
-
+  //model.plotOn(Lambda_cplus_TAUframe, Name("Model"), DrawOption("L")) ;
+  //model.plotOn(Lambda_cplus_TAUframe, Components(expo2), LineStyle(kDashed)) ;
+  //model.paramOn(Lambda_cplus_TAUframe,Layout(0.19, 0.45, 0.88)) ; //was 0.4
+  //Lambda_cplus_TAUframe->getAttText()->SetTextSize(0.022) ; 
+  
+  //RooDataHist hist("hist","hist", RooArgSet(Lambda_cplus_TAU), *ds) ;
+  //Double_t chi2 = Lambda_cplus_TAUframe->chiSquare("Model","data",2) ;
+  //t1->Draw();
+  
    
 
-   // Chi^2___________________
-   //Lambda_cplus_M.setBins(100);
-   //RooDataHist hist("hist","hist", RooArgSet(Lambda_cplus_M), *ds) ;
-   //RooChi2Var chi2("chi2","chi2", model, hist, true) ;
-   //RooMinuit minuit(chi2);
-   //minuit.migrad();
-   //minuit.hesse();
-
-   // Draw on Canvas   
-   TCanvas *c1 = new TCanvas("c1","canvas_name",700,500);
-   c1->cd(1) ; 
-   //c1->SetLogy() ;
- cout<<"mark8"<<endl;
+  // Chi^2___________________
+  //Lambda_cplus_M.setBins(100);
+  //RooDataHist hist("hist","hist", RooArgSet(Lambda_cplus_M), *ds) ;
+  //RooChi2Var chi2("chi2","chi2", model, hist, true) ;
+  //RooMinuit minuit(chi2);
+  //minuit.migrad();
+  //minuit.hesse();
+  
+  // Draw on Canvas   
+  TCanvas *c1 = new TCanvas("c1","canvas_name",700,500);
+  c1->cd(1) ; 
+  //c1->SetLogy() ;
+  
    gPad->SetLeftMargin(0.15) ;
- cout<<"mark9"<<endl; 
    Lambda_cplus_TAUframe->GetYaxis()->SetTitleOffset(1.4) ; 
- cout<<"mark10"<<endl;  
- Lambda_cplus_TAUframe->Draw() ;
- cout<<"mark11"<<endl;  
- c1->SaveAs("temp_binned.eps");
- cout<<"mark12"<<endl;
+   Lambda_cplus_TAUframe->Draw() ;
+   c1->SaveAs("temp_binned.eps");
    // create canvas
    //TCanvas *c1 = new TCanvas("c1","canvas_name",10,10,700,500) ;
    //formatCanvas4(c1) ; 
@@ -96,28 +90,28 @@ void binning() {
    //c1->SetGrid();
    //frame->GetYaxis()->SetTitleOffset(1.4) ; frame->Draw() ;
    
-
-
-  //TCanvas *c1 = new TCanvas("c1","GausFit01",10,10,700,500);
-  //TCanvas* c1 = new TCanvas("rf101_basics","rf101_basics",800,400) ;
-  //c1->Divide(2) ;
-  //c1->cd(1) ; gPad->SetLeftMargin(0.15) ; xframe->GetYaxis()->SetTitleOffset(1.6) ; xframe->Draw() ;
-  //c1->cd(2) ; gPad->SetLeftMargin(0.15) ; xframe2->GetYaxis()->SetTitleOffset(1.6) ; xframe2->Draw() ; 
-  //xframe->Draw();
+   
+   
+   //TCanvas *c1 = new TCanvas("c1","GausFit01",10,10,700,500);
+   //TCanvas* c1 = new TCanvas("rf101_basics","rf101_basics",800,400) ;
+   //c1->Divide(2) ;
+   //c1->cd(1) ; gPad->SetLeftMargin(0.15) ; xframe->GetYaxis()->SetTitleOffset(1.6) ; xframe->Draw() ;
+   //c1->cd(2) ; gPad->SetLeftMargin(0.15) ; xframe2->GetYaxis()->SetTitleOffset(1.6) ; xframe2->Draw() ; 
+   //xframe->Draw();
    
    TLatex Tl;
    Tl.SetNDC();
    Tl.SetTextSize(0.025); //was 0.02
    Tl.DrawLatex(0.69,0.75,"#scale[1.1]{#Lambda^{+}_{c}} #rightarrow K^{-} #pi^{+} #it{p}");
    Tl.DrawLatex(0.68,0.8,"Charmed Lambda (udc)");
-
+   
    // Print info to screen
    cout<<endl<<"________________INFO__________________"<<endl<<endl;  
-   cout<< "Lowest independent variable value = "<<lowest<<endl;
-   cout<< "Highest independent variable value= "<<highest<<endl;
+   cout<< "Lowest independent variable value in dataset = "<<lowest<<endl;
+   cout<< "Highest independent variable value in dataset = "<<highest<<endl;
    ds->Print();  //number of events in dataset    
    //rmodel->Print(); //results  
-   //]cout<<"Chi squared ="<<chi2<<endl ;
+   //cout<<"Chi squared ="<<chi2<<endl ;
 }
 
 
