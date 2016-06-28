@@ -45,7 +45,7 @@ void fitfunc() {
 
 
   // Define x-axis variable, get limits.
-  RooRealVar Lambda_cplus_TAU("Lambda_cplus_TAU","Lambda_cplus_TAU",-0.00019 ,0.0015 ,"sec(?!)") ;  
+  RooRealVar Lambda_cplus_TAU("Lambda_cplus_TAU","Lambda_cplus_TAU",-0.00019 ,0.0015 ,"ns") ;  
   double highest;
   double lowest;
   ds->RooAbsData::getRange(Lambda_cplus_TAU, lowest, highest);
@@ -90,7 +90,13 @@ void fitfunc() {
    
    
    
-   Lambda_cplus_TAU.setRange("R1",0.00018, 0.0012);
+   Lambda_cplus_TAU.setRange("R1",0.00025, 0.002); // NB: max is 2 pico seconds (0.002ns) and is 10x 
+                                                   // lifetime of Lambda_cplus. Thus ~0.005% of signal 
+                                                   // is above cut
+                                                   // min is 0.25ps, there is a hard cut of decay 
+                                                   // time > 0.2 ps in the trigger. Use 0.25 to avoid 
+                                                   // any edge smearing.
+ 
    // Fit model
    model.fitTo(*ds, Range("R1"));
    //expo1.fitTo(*ds, Range("R1"));
