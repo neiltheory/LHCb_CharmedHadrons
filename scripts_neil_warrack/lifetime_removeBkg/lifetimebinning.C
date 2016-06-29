@@ -21,17 +21,25 @@
 
 using namespace RooFit ;
 
-void binning() {
 
-  TFile *datafile = TFile::Open("~/Documents/uni/LHCb_CharmSummerProj/Gedcode/baryon-lifetimes-2015/data/run-II-data/datafileLambda_TAUmin200fs_max2200fs.root"); // Open "dataset" .root file (made using mkDataSet.c script).
+// Script opens a previously made .root file which contains a dataset type object which 
+// holds all events in a preselected and appropriate range for the TAU lifetime variable 
+// of the Lambda_cplus particel (OR the Xi_c).
 
+
+void binFit() {
+
+  TFile *datafile = TFile::Open("~/Documents/uni/LHCb_CharmSummerProj/Gedcode/baryon-lifetimes-2015/data/run-II-data/datafileLambda_TAUmin200fs_max2200fs.root"); // Open appropriate "dataset" .root file (made using mkDataSet.c script).
+
+  // Define dataset
   RooDataSet* ds = (RooDataSet*)datafile->Get("ds") ;
 
   // Define x-axis variable, get limits.
-  RooRealVar Lambda_cplus_TAU("Lambda_cplus_TAU","Lambda_cplus_TAU",0.0002 ,0.0022 ,"ns") ;  
+  RooRealVar Lambda_cplus_TAU("Lambda_cplus_TAU","Lambda_cplus_TAU",0.0002 ,0.0022 ,"ns") ;  //real range of interest is [0.00025, 0.002] but this can be defined later
   double highest;
   double lowest;
   ds->RooAbsData::getRange(Lambda_cplus_TAU, lowest, highest);
+  ds->Print();  //number of events in dataset    
 
   //Lambda_cplus_TAU.setRange("R1",0.00018, 0.0012);
    
