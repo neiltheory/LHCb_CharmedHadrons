@@ -46,7 +46,7 @@ void fitfunc() {
   */
 
 
-  // Define x-axis variable, get limits.
+  // Define Mass variable, get limits.
   RooRealVar Lambda_cplus_M("Lambda_cplus_M","Lambda_cplus_M",2216 ,2356 ,"GeV") ;  
   double highest;
   double lowest;
