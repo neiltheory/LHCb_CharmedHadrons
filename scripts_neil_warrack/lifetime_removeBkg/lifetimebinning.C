@@ -40,8 +40,6 @@ void binFit() {
   double highestTAU;
   double lowestTAU;
   ds->RooAbsData::getRange(Lambda_cplus_TAU, lowestTAU, highestTAU);
-  ds->Print();  //NB: number of events in dataset ( = 861373 )
-
 
   // Define Mass variable, get limits.
   RooRealVar Lambda_cplus_M("Lambda_cplus_M","Lambda_cplus_M",2216 ,2356, "GeV") ; 
@@ -53,12 +51,13 @@ void binFit() {
   double mass_peak = 2286;
 
   // Build combined double Gaussian PDF; "gaussComb".
-  RooRealVar gausMean("gausMean", "gausMean",mass_peak, lowestM, highestM, "GeV") ;
+  RooRealVar gausMean1("gausMean1", "gausMean1",mass_peak, lowestM, highestM, "GeV") ;
   RooRealVar sigma1("sigma1","sigma1", 6, 0, 50) ;
-  RooGaussian gauss1("gauss1","gauss1",Lambda_cplus_M, gausMean, sigma1) ;
+  RooGaussian gauss1("gauss1","gauss1",Lambda_cplus_M, gausMean1, sigma1) ;
 
-  RooRealVar sigma2("sigma2","sigma2", 6, 0, 50) ;
-  RooGaussian gauss2("gauss2","gauss2",Lambda_cplus_M, gausMean, sigma2) ;
+  RooRealVar gausMean2("gausMean2", "gausMean2",mass_peak, lowestM, highestM, "GeV") ;
+  RooRealVar sigma2("sigma2","sigma2", 4, 0, 100) ;
+  RooGaussian gauss2("gauss2","gauss2",Lambda_cplus_M, gausMean2, sigma2) ;
 
   RooRealVar nFrac("nFrac", "nFrac", 0.5, 0.0, 1.) ;
   RooAddPdf gaussComb("gaussComb","gaussComb", RooArgList(gauss1, gauss2), RooArgList(nFrac)) ;
@@ -66,7 +65,7 @@ void binFit() {
   //Lambda_cplus_TAU.setRange("R1",0.00018, 0.0012);
    
   // Build exponential PDF; "expo_bkg"
-  RooRealVar expoPar("expoPar","expoPar", -0.00001, -5., 0.);
+  RooRealVar expoPar("expoPar","expoPar", -0.0001, -1., 0.);
   RooExponential expo_bkg("expo_bkg", "expo_bkg", Lambda_cplus_M, expoPar);
 
   // Build model PDF
@@ -80,12 +79,30 @@ void binFit() {
   // Fit model
   //model.fitTo(*ds, Range("R1"));
   //expo1.fitTo(*ds, Range("R1"));
-  model.fitTo(*ds) ;
+  model.fitTo(*ds, Extended()) ;
   //RooFitResult* rmodel = model.fitTo(*ds,Save()) ;
   //RooFitResult* rexpo_bkg = expo_bkg.fitTo(*ds,Save());
-  
+
+
+
+  //_____________  
+  // Plot
+  RooPlot *fullDataFit = Lambda_cplus_M.frame(Title("-Title-"));
+  //ds.plotOn(frame,Binning(25)); //default is 100 bins
+  ds->plotOn(fullDataFit, Name("data"), MarkerColor(kBlack)) ;
+  ds->statOn(fullDataFit, Layout(0.65,0.88,0.2), What("N")) ; //NB Layout(xmin,xmax,ymax)
+  model.plotOn(fullDataFit, Name("Model"), DrawOption("L")) ;
+  model.plotOn(fullDataFit, Components(expo_bkg), LineStyle(kDashed)) ;
+  model.paramOn(fullDataFit,Layout(0.19, 0.45, 0.88)) ; //was 0.4
+  fullDataFit->getAttText()->SetTextSize(0.022) ;
+
+  RooDataHist hist4Chi2("hist4Chi2","hist4Chi2", RooArgSet(Lambda_cplus_M), *ds) ;
+  Double_t chi2 = fullDataFit->chiSquare("Model","data",7) ;
+  //_____________  
+
   // Set model fit variables to constants (NOT COEFFs!)
-  gausMean.setConstant() ;
+  gausMean1.setConstant() ;
+  gausMean2.setConstant() ;
   sigma1.setConstant() ;
   sigma2.setConstant() ;
   nFrac.setConstant() ;
@@ -120,7 +137,8 @@ void binFit() {
     // Creat dataset for bin i only
     RooDataSet* bindata = ds->reduce(RooFit::Cut(TString(binLowEdgeStr.str()) + " < Lambda_cplus_TAU && Lambda_cplus_TAU <= " + TString(binHighEdgeStr.str()))) ;
 
-    model.fitTo(*bindata, gErrorIgnoreLevel = kInfo) ;
+    //model.fitTo(*bindata, gErrorIgnoreLevel = kInfo) ;
+    model.fitTo(*bindata, "l") ;
     double binSignalYield = nSignal.getVal() ;
     double binError = nSignal.getError() ;
     double binCentre = (binBoundLo + binBoundHi)/2. ;
@@ -143,68 +161,83 @@ void binFit() {
     h_sig->SetBinError(i+1, signalError[i]) ;
 }
 
-  TFile hf("histotest.root", "RECREATE") ;
+
+
+  TFile hf("histo_Lambda_cplus_TAU_lifetime_SigOnly.root", "RECREATE") ;
   h_sig.Write() ;
-  /*
-  // Plot
-  //RooPlot *Lambda_cplus_TAUframe = Lambda_cplus_TAU.frame(Title("-Title-"));
-  int nBins ;
-  nBins = 10 ;
-  RooPlot *Lambda_cplus_TAUframe = new RooPlot("Lambda_cplus_TAUframe","Lambda_cplus_TAUframe", Lambda_cplus_TAU, 0.00025, 0.002, nBins) ; 
-
-  //ds.plotOn(frame,Binning(10)); //default is 100 bins
-  ds->plotOn(Lambda_cplus_TAUframe, Name("data"), MarkerColor(kBlack)) ;
-*/
+  //__________________TEST1
+  TCanvas *c102 = new TCanvas("c102","",600,900) ;
+  formatCanvas4(c102) ;
 
 
-  //ds->statOn(Lambda_cplus_TAUframe, Layout(0.65,0.88,0.2), What("N")) ; //NB Layout(xmin,xmax,ymax) 
-  //model.plotOn(Lambda_cplus_TAUframe, Name("Model"), DrawOption("L")) ;
-  //model.plotOn(Lambda_cplus_TAUframe, Components(expo2), LineStyle(kDashed)) ;
-  //model.paramOn(Lambda_cplus_TAUframe,Layout(0.19, 0.45, 0.88)) ; //was 0.4
-  //Lambda_cplus_TAUframe->getAttText()->SetTextSize(0.022) ; 
-  
-  //RooDataHist hist("hist","hist", RooArgSet(Lambda_cplus_TAU), *ds) ;
-  //Double_t chi2 = Lambda_cplus_TAUframe->chiSquare("Model","data",2) ;
-  //t1->Draw();
-  
-   
-
-  // Chi^2___________________
-  //Lambda_cplus_M.setBins(100);
-  //RooDataHist hist("hist","hist", RooArgSet(Lambda_cplus_M), *ds) ;
-  //RooChi2Var chi2("chi2","chi2", model, hist, true) ;
-  //RooMinuit minuit(chi2);
-  //minuit.migrad();
-  //minuit.hesse();
-  /*  
-  // Draw on Canvas   
-  TCanvas *c1 = new TCanvas("c1","canvas_name",700,500);
-  c1->cd(1) ; 
+  c102_1->cd() ;
+  c1->SetFillColor(33) ;
+  c1->SetFrameFillColor(41) ;
+  c1->SetGrid() ;
+  fullDataFit->GetYaxis()->SetTitleOffset(1.4) ; fullDataFit->Draw() ;
+  gPad->SetLeftMargin(0.15) ;
+  fullDataFit->GetYaxis()->SetTitleOffset(1.4) ;
+  fullDataFit->Draw() ;
+  c1->SaveAs("TEST1.eps");
+  //__________________TEST2  
+  // Plot & Draw
+  //TCanvas *c1 = new TCanvas("c1","c1", 800, 800) ;
   //c1->SetLogy() ;
-  
-   gPad->SetLeftMargin(0.15) ;
-   Lambda_cplus_TAUframe->GetYaxis()->SetTitleOffset(1.4) ; 
-   Lambda_cplus_TAUframe->Draw() ;
-   c1->SaveAs("temp_binned3.eps");
-  */  
+  //RooPlot *signalPlot = Lambda_cplus_TAU.frame(Title("Signal plot")) ;
+  h_sig.Draw() ;
+  //signalPlot->Draw() ;
+  c1->SaveAs("TEST2signalHistoPlot_from_lifetimebinning.png") ;
 
- // create canvas
-   //TCanvas *c1 = new TCanvas("c1","canvas_name",10,10,700,500) ;
-   //formatCanvas4(c1) ; 
-   //c1_1->cd();
-   //c1->SetFillColor(33);
-   //c1->SetFrameFillColor(41);
-   //c1->SetGrid();
-   //frame->GetYaxis()->SetTitleOffset(1.4) ; frame->Draw() ;
-   
-   
-   
-   //TCanvas *c1 = new TCanvas("c1","GausFit01",10,10,700,500);
-   //TCanvas* c1 = new TCanvas("rf101_basics","rf101_basics",800,400) ;
-   //c1->Divide(2) ;
-   //c1->cd(1) ; gPad->SetLeftMargin(0.15) ; xframe->GetYaxis()->SetTitleOffset(1.6) ; xframe->Draw() ;
-   //c1->cd(2) ; gPad->SetLeftMargin(0.15) ; xframe2->GetYaxis()->SetTitleOffset(1.6) ; xframe2->Draw() ; 
-   //xframe->Draw();
+
+
+  cout<<endl<<endl<<"************info************"<<endl;
+  cout<<"signalHistoPlot_from_lifetimebinning.png written"<<endl<<endl ;
+  cout<<"double Gaussian fit parameters to full data (signal + background):"<<endl;
+  cout<<gausMean1<<endl ;
+  cout<<gausMean2<<endl ;
+  cout<<sigma1<<endl ;
+  cout<<sigma2<<endl ;
+  cout<<nFrac<<endl ;
+  cout<<"exponential fit parameters to full data (signal + background):"<<endl;
+   cout<<expoPar<<endl<<endl ;
+
+
+
+  // Create arrays to store signal yeald and error for each bin. 
+  //double signalYield[10] ;
+  //double signalError[10] ;
+  //double binCent[10] ; // Records centre of bin, a relic from Gediminas' code
+
+  // Split TAU distribution into bins, make mass fit to bin contents, fill 
+  // histogram "h_sig" with signal yield calculated from fit.
+
+  int k ;
+  for (k=0; k<nBins; k++){
+    cout<<"Bin number "<<k+1<<" (bin centre = "<<binCent[k]<<"ns):"<<endl;
+    cout<<"   "<<"signal yield = "<<signalYield[k]<<endl ;
+    cout<<"   "<<"signal error = "<<signalError[k]<<endl<<endl ;
+  }
+  cout<<"done."<<endl<<endl<<endl ;
+
+    
+    /*
+        // Chi^2___________________
+	Lambda_cplus_M.setBins(100);
+	RooDataHist hist("hist","hist", RooArgSet(Lambda_cplus_M), *ds) ;
+	RooChi2Var chi2("chi2","chi2", model, hist, true) ;
+	RooMinuit minuit(chi2);
+	minuit.migrad();
+	minuit.hesse();
+    */
+    
+    /*  
+	gPad->SetLeftMargin(0.15) ;
+	Lambda_cplus_TAUframe->GetYaxis()->SetTitleOffset(1.4) ; 
+	Lambda_cplus_TAUframe->Draw() ;
+	c1->SaveAs("temp_binned3.eps");
+    */  
+    
+    
    /*
    TLatex Tl;
    Tl.SetNDC();
