@@ -1,7 +1,6 @@
 #ifndef __CINT__
 #include "RooGlobalFunc.h"
 #endif
-#include "RooAddPdf.h"
 #include "RooRealVar.h"
 #include "RooDataSet.h"
 #include "RooDataHist.h"
@@ -11,18 +10,17 @@
 #include "TTree.h"
 #include "TH1D.h"
 #include "TRandom.h"
-#include "TFile.h"
+
 using namespace RooFit ;
 using namespace RooStats ; //namespace for sWeights 
 
 void fitter()
 {
 // Load tree file and data set file for Lambda mass entries
-//TFile *myfile = TFile::Open("/nfs/lhcb/malexander01/charm/baryon-lifetimes-2015/data/run-II-data/turbo_2015_data.root");
-TFile *myfile = TFile::Open("~/Documents/uni/LHCb_CharmSummerProj/data/turbo_2015_data.root");
+TFile *myfile = TFile::Open("/nfs/lhcb/malexander01/charm/baryon-lifetimes-2015/data/run-II-data/turbo_2015_data.root");
 
-//TFile *datafile = TFile::Open("/afs/phas.gla.ac.uk/user/g/gsarpis/lambdaC/datafile.root");
- TFile *datafile = TFile::Open("~/Documents/uni/LHCb_CharmSummerProj/data/turbo_2015_data.root");
+TFile *datafile = TFile::Open("/afs/phas.gla.ac.uk/user/g/gsarpis/lambdaC/datafile.root");
+
 TTree* mytree = (TTree*) myfile->Get("Lambda_cToKppiTuple/DecayTree;1");
 
 RooRealVar Lambda_cplus_M("Lambda_cplus_M","Lambda_cplus_M",2216,2356);
@@ -34,6 +32,7 @@ RooDataSet* ds = (RooDataSet*) datafile->Get("ds;1");
 double mass_lower_bound = 2216;
 double mass_upper_bound = 2356;
 double mass_peak = 2286;
+
 /*Code for saving dataset
 RooDataSet ds("ds","ds with Lambda_cplus_M",mytree,RooArgSet(Lambda_cplus_M));
 TFile f("datafile.root","RECREATE") ;
