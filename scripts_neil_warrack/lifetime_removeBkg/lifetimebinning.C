@@ -30,7 +30,8 @@ using namespace RooFit ;
 void binFit() {
 
   // Open appropriate "dataset" .root file (made using mkDataSet.c script)
-  TFile *datafile = TFile::Open("~/Documents/uni/LHCb_CharmSummerProj/Gedcode/baryon-lifetimes-2015/data/run-II-data/datafileLambda_TAUmin200fs_max2200fs_Mmin2216_max2356.root");
+  //TFile *datafile = TFile::Open("~/Documents/uni/LHCb_CharmSummerProj/Gedcode/baryon-lifetimes-2015/data/run-II-data/datafileLambda_TAUmin200fs_max2200fs_Mmin2216_max2356.root");
+  TFile *datafile = TFile::Open("~/Documents/uni/LHCb_CharmSummerProj/Gedcode/baryon-lifetimes-2015/data/run-II-data/datafileLambda_TAUmin200fs_max2200fs_Mmin2216_max2356_CutIPCHI2lt3.root"); 
 
   // Define dataset
   RooDataSet* ds = (RooDataSet*)datafile->Get("ds") ;
@@ -47,10 +48,13 @@ void binFit() {
   double lowestM;
   ds->RooAbsData::getRange(Lambda_cplus_M, lowestM, highestM) ;
   
-    // 'Initializing' value for fit
-  double mass_peak = 2286;
+  // Define IPCHI2 variable
+  RooRealVar Lambda_cplus_IPCHI2_OWNPV("Lambda_cplus_IPCHI2_OWNPV","Lambda_cplus_IPCHI2_OWNPV",-100 ,100) ; 
 
   // Build combined double Gaussian PDF; "gaussComb".
+ 
+  double mass_peak = 2286 ;  // initialize gaussian mean value for fit
+
   RooRealVar gausMean1("gausMean1", "gausMean1",mass_peak, lowestM, highestM, "GeV") ;
   RooRealVar sigma1("sigma1","sigma1", 6, 0, 50) ;
   RooGaussian gauss1("gauss1","gauss1",Lambda_cplus_M, gausMean1, sigma1) ;
