@@ -24,7 +24,8 @@
  * Launch the GUI via the command:                                                *
  *                                                                                *
  *    root -l ./TMVAGui.C                                                         *
- *                                                                                *
+ *    OR                                                                          *
+ *    $ROOTSYS/tmva/test/TMVAGui.C                                                *
  **********************************************************************************/
 
 #include <cstdlib>
@@ -160,7 +161,7 @@ void TMVAClassification( TString myMethodList = "" )
    // --- Here the preparation phase begins
 
    // Create a ROOT output file where TMVA will store ntuples, histograms, etc.
-   TString outfileName( "TMVA2.root" );
+   TString outfileName( "TMVA.root" );
    TFile* outputFile = TFile::Open( outfileName, "RECREATE" );
 
    // Create the factory object. Later you can choose the methods
@@ -185,9 +186,9 @@ void TMVAClassification( TString myMethodList = "" )
    // note that you may also use variable expressions, such as: "3*var1/var2*abs(var3)"
    // [all types of expressions that can also be parsed by TTree::Draw( "expression" )]
 
-   factory->AddVariable( "Lambdac_sph1", 'F' );
-   factory->AddVariable( "Lambdac_sh1h2", 'F' );
-   factory->AddVariable( "Lambdac_sph2", 'F' );
+   //factory->AddVariable( "Lambdac_sph1", 'F' );
+   //factory->AddVariable( "Lambdac_sh1h2", 'F' );
+   //factory->AddVariable( "Lambdac_sph2", 'F' );
    factory->AddVariable( "proton_LcRest_costheta", 'F' );
    factory->AddVariable( "proton_LcRest_cosphi", 'F' );
    factory->AddVariable( "Lambdac_LcRest_thetah1h2", 'F' );
@@ -227,7 +228,9 @@ void TMVAClassification( TString myMethodList = "" )
    // (it is also possible to use ASCII format as input -> see TMVA Users Guide)
    //TString fname = "/nfs/lhcb/malexander01/charm/baryon-lifetimes-2015/data/run-II-data/turbo_2015_data_wAngles_wBDTGWeights.root";
    //TString fname = "~/Documents/uni/LHCb_CharmSummerProj/data/turbo_2015_data.root";
-   TString fname = "/afs/phas.gla.ac.uk/user/n/nwarrack/public_ppe/myLHCb/Gedcode/LHCb_CharmedHadrons/data/turbo_2015_data.root";
+   TString fname = "~/Documents/uni/LHCb_CharmSummerProj/Gedcode/baryon-lifetimes-2015/data/run-II-data/turbo_2015_data_wAngles.root";
+   //TString fname = "~/Documents/uni/LHCb_CharmSummerProj/Gedcode/baryon-lifetimes-2015/data/run-II-data/datafileLambda_TAUmin200fs_max2200fs_Mmin2216_max2356_CutIPCHI2lt3.root";
+   //TString fname = "/afs/phas.gla.ac.uk/user/n/nwarrack/public_ppe/myLHCb/Gedcode/LHCb_CharmedHadrons/data/turbo_2015_data.root";
    
    if (gSystem->AccessPathName( fname ))  // file does not exist in local directory
       gSystem->Exec("curl -O http://root.cern.ch/files/tmva_class_example.root");
@@ -237,16 +240,18 @@ void TMVAClassification( TString myMethodList = "" )
    std::cout << "--- TMVAClassification       : Using input file: " << input->GetName() << std::endl;
    
    // --- Register the training and test trees
-
+   cout<<"MARK1"<<endl;
    TTree *signal     = (TTree*)input->Get("DecayTree");
+    cout<<"MARK2"<<endl;
    TTree *background = (TTree*)input->Get("DecayTree");
    
    // global event weights per tree (see below for setting event-wise weights)
    Double_t signalWeight     = 1.0;
    Double_t backgroundWeight = 1.0;
-   
+   cout<<"MARK2.2"<<endl;   
    // You can add an arbitrary number of signal or background trees
-   factory->AddSignalTree    ( signal,     signalWeight     );
+   factory->AddSignalTree( signal, signalWeight);
+   cout<<"MARK3"<<endl;   
    factory->AddBackgroundTree( background, backgroundWeight );
    
    // To give different trees for training and testing, do as follows:
