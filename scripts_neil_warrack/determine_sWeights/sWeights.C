@@ -29,9 +29,11 @@ using namespace RooFit ;
 
 void sWeigher() {
 
-  // Open appropriate "dataset" .root file (made using mkDataSet.c script)
-  //TFile *datafile = TFile::Open("~/Documents/uni/LHCb_CharmSummerProj/Gedcode/baryon-lifetimes-2015/data/run-II-data/datafileLambda_TAUmin200fs_max2200fs_Mmin2216_max2356.root");
-  TFile *datafile = TFile::Open("~/Documents/uni/LHCb_CharmSummerProj/Gedcode/baryon-lifetimes-2015/data/run-II-data/datafileLambda_TAUmin200fs_max2200fs_Mmin2216_max2356_CutIPCHI2lt3.root"); 
+  TFile *fullFile = TFile::Open("~/Documents/uni/LHCb_CharmSummerProj/learning_root/turbo_2015_data.root") ;
+
+  TTree* mytree = (TTree*) fullFile->Get("Lambda_cToKppiTuple/DecayTree;1") ;  
+
+  TFile *datafile = TFile::Open("~/Documents/uni/LHCb_CharmSummerProj/Gedcode/baryon-lifetimes-2015/data/run-II-data/datafileLambda_TAUmin200fs_max2200fs_Mmin2216_max2356_CutIPCHI2lt3.root") ; 
 
   // Define dataset
   RooDataSet* ds = (RooDataSet*)datafile->Get("ds") ;
@@ -81,28 +83,7 @@ void sWeigher() {
   RooAddPdf model("model","model",RooArgList(gaussComb, expo_bkg),RooArgList(nSignal, nBkg));
 
   // Fit model
-  //model.fitTo(*ds, Range("R1"));
-  //expo1.fitTo(*ds, Range("R1"));
   model.fitTo(*ds, Extended()) ;
-  //RooFitResult* rmodel = model.fitTo(*ds,Save()) ;
-  //RooFitResult* rexpo_bkg = expo_bkg.fitTo(*ds,Save());
-
-
-
-  //_____________  
-  // Plot
-  RooPlot *fullDataFit = Lambda_cplus_M.frame(Title("-Title-"));
-  //ds.plotOn(frame,Binning(25)); //default is 100 bins
-  ds->plotOn(fullDataFit, Name("data"), MarkerColor(kBlack)) ;
-  ds->statOn(fullDataFit, Layout(0.65,0.88,0.2), What("N")) ; //NB Layout(xmin,xmax,ymax)
-  model.plotOn(fullDataFit, Name("Model"), DrawOption("L")) ;
-  model.plotOn(fullDataFit, Components(expo_bkg), LineStyle(kDashed)) ;
-  model.paramOn(fullDataFit,Layout(0.19, 0.45, 0.88)) ; //was 0.4
-  fullDataFit->getAttText()->SetTextSize(0.022) ;
-
-  RooDataHist hist4Chi2("hist4Chi2","hist4Chi2", RooArgSet(Lambda_cplus_M), *ds) ;
-  Double_t chi2 = fullDataFit->chiSquare("Model","data",7) ;
-  //_____________  
 
   // Set model fit variables to constants (NOT COEFFs!)
   gausMean1.setConstant() ;
@@ -120,17 +101,19 @@ void sWeigher() {
 
 
   // Code for saving dataset with weights
-  RooRealVar w("w","w",-5000,5000);
-  RooDataSet Wgt("Wgt","dataset with weights",mytree,RooArgSet(Lambda_cplus_M),WeightVar(w));
-  TFile f("sWeightsdatafile.root","RECREATE") ;
+  //RooRealVar w("w","w",-5000,5000);
+  //RooDataSet Wgt("Wgt","Wgt", mytree, RooArgSet(Lambda_cplus_M), WeightVar(w));
+  TFile f("sWeightsDatafile.root","RECREATE") ;
   sDataM->Write() ;
   f.Close() ;
+  cout<<endl<<"sWeightsDatafile.root created in current directory..."<<endl ;
+ 
 
-  TFile treefile("sTree.root", "recreate") ;
-  RooTreeDataStore sTree("sTree", "sTree", *ds->get(0), *ds->store()) ;
-  TTree* tree = sTree.tree() ;
-  tree->SetBranchStatus("Lambda_cplus_M", 0) ; // you don't want to save the mass variables again.
-  tree->Write() ;
-  treefile.Close() ;
+  //TFile treefile("sTree.root", "recreate") ;
+  //RooTreeDataStore sTree("sTree", "sTree", *ds->get(0), *ds->store()) ;
+  //TTree* tree = sTree.tree() ;
+  //tree->SetBranchStatus("Lambda_cplus_M", 0) ; // you don't want to save the mass variables again.
+  //tree->Write() ;
+  //treefile.Close() ;
 
 }
