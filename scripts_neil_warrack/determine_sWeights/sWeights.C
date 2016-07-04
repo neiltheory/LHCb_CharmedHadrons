@@ -27,7 +27,7 @@ using namespace RooFit ;
 // of the Lambda_cplus particel (OR the Xi_c).
 
 
-void binFit() {
+void sWeigher() {
 
   // Open appropriate "dataset" .root file (made using mkDataSet.c script)
   //TFile *datafile = TFile::Open("~/Documents/uni/LHCb_CharmSummerProj/Gedcode/baryon-lifetimes-2015/data/run-II-data/datafileLambda_TAUmin200fs_max2200fs_Mmin2216_max2356.root");
