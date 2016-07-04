@@ -17,8 +17,7 @@ using namespace RooStats ; //namespace for sWeights
 void fitter()
 {
 // Load tree file and data set file for Lambda mass entries
-//TFile *myfile = TFile::Open("/nfs/lhcb/malexander01/charm/baryon-lifetimes-2015/data/run-II-data/turbo_2015_data.root");
-TFile *myfile = TFile::Open("~/Documents/uni/LHCb_CharmSummerProj/data/turbo_2015_data.root");
+TFile *myfile = TFile::Open("/nfs/lhcb/malexander01/charm/baryon-lifetimes-2015/data/run-II-data/turbo_2015_data.root");
 
 TFile *datafile = TFile::Open("/afs/phas.gla.ac.uk/user/g/gsarpis/lambdaC/datafile.root");
 
