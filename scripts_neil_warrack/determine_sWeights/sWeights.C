@@ -22,10 +22,7 @@
 using namespace RooFit ;
 
 
-// Script opens a previously made .root file which contains a dataset type object which 
-// holds all events in a preselected and appropriate range for the TAU lifetime variable 
-// of the Lambda_cplus particel (OR the Xi_c).
-
+// Script opens a previously made .root file which contains a dataset type object and calculates 'sWeights'.
 
 void sWeigher() {
 
@@ -93,27 +90,83 @@ void sWeigher() {
   nFrac.setConstant() ;
   expoPar.setConstant() ;
   
+  RooMsgService::instance().setSilentMode(true);
+
   // Create and record sWeights
   RooStats::SPlot* sDataM = new RooStats::SPlot("sData", "An SPlot", *ds, &model, RooArgList(nSignal, nBkg)) ;
 
   std::cout << std::endl <<  "Yield of signal is " << nSignal.getVal() << ".  From sWeights it is " << sDataM->GetYieldFromSWeight("nSignal") << std::endl;
   std::cout << "Yield of background is " << nBkg.getVal() << ".  From sWeights it is " << sDataM->GetYieldFromSWeight("nBkg") << std::endl << std::endl;
 
+  for (Int_t i=90; i < 100; i++){
+    cout << "nSignal: "<<sDataM->GetSWeight(i,"nSignal")
+	 << ", nBkg: "<<sDataM->GetSWeight(i,"nBkg")
+	 << ", Total Weight: "<<sDataM->GetSumOfEventSWeight(i)
+	 << endl;
+  }
 
   // Code for saving dataset with weights
   //RooRealVar w("w","w",-5000,5000);
   //RooDataSet Wgt("Wgt","Wgt", mytree, RooArgSet(Lambda_cplus_M), WeightVar(w));
-  TFile f("sWeightsDatafile.root","RECREATE") ;
-  sDataM->Write() ;
-  f.Close() ;
-  cout<<endl<<"sWeightsDatafile.root created in current directory..."<<endl ;
+  TFile *dsWithWeights = TFile::Open("datafileLambda_TAUmin200fs_max2200fs_Mmin2216_max2356_CutIPCHI2lt3_withWeights.root","RECREATE") ;
+  ds->Write() ;
+  dsWithWeights->Close() ;
+  cout<<endl<<"datafileLambda_TAUmin200fs_max2200fs_Mmin2216_max2356_CutIPCHI2lt3_withWeights.root created in current directory..."<<endl ;
  
+  cout<<"plotting signal and background..."<<endl;
 
-  //TFile treefile("sTree.root", "recreate") ;
-  //RooTreeDataStore sTree("sTree", "sTree", *ds->get(0), *ds->store()) ;
-  //TTree* tree = sTree.tree() ;
-  //tree->SetBranchStatus("Lambda_cplus_M", 0) ; // you don't want to save the mass variables again.
-  //tree->Write() ;
-  //treefile.Close() ;
+  TFile treefile("sTree.root", "recreate") ;
+  cout<<"step"<<endl;  
+  RooTreeDataStore sTree("sTree", "sTree", *ds->get(0), *ds->store()) ;
+  cout<<"step"<<endl;    
+  TTree* tree = sTree.tree() ;
+  cout<<"step"<<endl;  
+  tree->SetBranchStatus("Lambda_cplus_M", 0) ; // you don't want to save the mass variables again.
+  cout<<"step"<<endl;  
+  tree->Write() ;
+  cout<<"step"<<endl;  
+  treefile.Close() ;
+  cout<<"step"<<endl;  
 
+
+  // Plot =================================================
+  RooPlot *fullDataFit = Lambda_cplus_M.frame(Title("SignalAndBkg"));
+   ds->plotOn(fullDataFit, Name("data"), MarkerColor(kBlack)) ;
+  ds->statOn(fullDataFit, Layout(0.65,0.88,0.2), What("N")) ; //NB Layout(xmin,xmax,ymax)
+  model.plotOn(fullDataFit, Name("Model"), DrawOption("L")) ;
+  model.plotOn(fullDataFit, Components(expo_bkg), LineStyle(kDashed)) ;
+  model.paramOn(fullDataFit,Layout(0.19, 0.45, 0.88)) ; //was 0.4
+  fullDataFit->getAttText()->SetTextSize(0.022) ;
+
+  // Draw =================================================
+  TCanvas *c102 = new TCanvas("c102","",600,900) ;
+  //formatCanvas4(c102) ;
+
+  gStyle->SetOptStat("") ;
+  
+  c102->cd() ;
+  fullDataFit->Draw() ;
+  c102->Update() ;  
+  c102->Print("SignalAndBkg01.pdf");
+  // ======================================================
+}
+
+// Canvas formatting (4 plots on landscape A4)
+void formatCanvas4(TCanvas* canvas){
+  canvas->SetBorderSize(2);
+  canvas->SetBorderMode(-1);
+  canvas->Clear();
+  canvas->Divide(2,2);
+  canvas->cd(1);
+  gPad->SetLeftMargin(0.2);
+  gPad->SetBottomMargin(0.2);
+  canvas->cd(2);
+  gPad->SetLeftMargin(0.2);
+  gPad->SetBottomMargin(0.2);
+  canvas->cd(3);
+  gPad->SetLeftMargin(0.2);
+  gPad->SetBottomMargin(0.2);
+  canvas->cd(4);
+  gPad->SetLeftMargin(0.2);
+  gPad->SetBottomMargin(0.2);
 }
