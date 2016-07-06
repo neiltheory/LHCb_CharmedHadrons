@@ -9,16 +9,12 @@
 #include "RooPlot.h"
 #include "TTree.h"
 #include "TH1D.h"
-#include "TRandom.h"
 #include "RooFitResult.h"
 #include "RooAddPdf.h"
 #include "RooExponential.h"
 #include "RooPolynomial.h"
-#include "RooAbsData.h"
-#include "TLatex.h"
-#include "TFile.h"
-#include "TLegend.h"
 
+using namespace std ;
 using namespace RooFit ;
 
 
@@ -31,7 +27,8 @@ void sWeigher() {
 
   TFile *fullFile = TFile::Open("~/Documents/uni/LHCb_CharmSummerProj/learning_root/turbo_2015_data.root") ;
   TTree* mytree = (TTree*) fullFile->Get("Lambda_cToKppiTuple/DecayTree;1") ;  
-  TFile *datafile = TFile::Open("~/Documents/uni/LHCb_CharmSummerProj/Gedcode/baryon-lifetimes-2015/data/run-II-data/datafileLambda_TAUmin200fs_max2200fs_Mmin2216_max2356_CutIPCHI2lt3.root") ; 
+  TFile *datafile = TFile::Open("~/Documents/uni/LHCb_CharmSummerProj/learning_root/DataSetLambda_TAUmin0002_max0022.root") ;
+  //TFile *datafile = TFile::Open("~/Documents/uni/LHCb_CharmSummerProj/Gedcode/baryon-lifetimes-2015/data/run-II-data/datafileLambda_TAUmin200fs_max2200fs_Mmin2216_max2356_CutIPCHI2lt3.root") ; 
 
 
   // Define dataset
@@ -39,7 +36,8 @@ void sWeigher() {
 
 
   // Define TAU variable, get limits.
-  RooRealVar Lambda_cplus_TAU("Lambda_cplus_TAU","Lambda_cplus_TAU",0.0002 ,0.0022 ,"ns") ;  //real range of interest is [0.00025, 0.002], this is defined later.
+  //RooRealVar Lambda_cplus_TAU("Lambda_cplus_TAU","Lambda_cplus_TAU",0.0002 ,0.0022 ,"ns") ;  //real range of interest is [0.00025, 0.002], this is defined later.
+  RooRealVar Lambda_cplus_TAU("Lambda_cplus_TAU","Lambda_cplus_TAU",0.00025 ,0.002 ,"ns") ;  //real range of interest is [0.00025, 0.002], this is defined later.
   double highestTAU;
   double lowestTAU;
   ds->RooAbsData::getRange(Lambda_cplus_TAU, lowestTAU, highestTAU);
@@ -76,8 +74,8 @@ void sWeigher() {
 
 
   // Build model PDF
-  RooRealVar nSignal("nSignal","nSignal", 200000, 0, 409570);
-  RooRealVar nBkg("nBkg","nBkg", 200000, 0, 409570);
+  RooRealVar nSignal("nSignal","nSignal", 200000, 0, 409570); // For CHI2 < 3 cut, the max yield is 147000
+  RooRealVar nBkg("nBkg","nBkg", 200000, 0, 409570);          // For CHI2 < 3 cut, the max yield is 147000
   
   //RooAddPdf model("model","model",RooArgList(gauss, pol0),RooArgList(nSignal, pol0_yield));
   //RooAddPdf model("model","model",RooArgList(gauss, expo_bkg),RooArgList(nSignal, nBkg));
@@ -101,10 +99,6 @@ void sWeigher() {
   // Create and record sWeights
   RooStats::SPlot* sDataM = new RooStats::SPlot("sData", "An SPlot", *ds, &model, RooArgList(nSignal, nBkg)) ;
 
-  // Check the values of the yields and the 'yields' from the sWeight are the same
-  std::cout << std::endl <<  "Yield of signal is " << nSignal.getVal() << ".  From sWeights it is " << sDataM->GetYieldFromSWeight("nSignal") << std::endl;
-  std::cout << "Yield of background is " << nBkg.getVal() << ".  From sWeights it is " << sDataM->GetYieldFromSWeight("nBkg") << std::endl << std::endl;
-
  /*
   for (Int_t i=90; i < 100; i++){
     cout << "nSignal: "<<sDataM->GetSWeight(i,"nSignal")
@@ -114,23 +108,35 @@ void sWeigher() {
   }
   */
 
-
+  /*
   // Save dataset with sWeights
-   TFile *dsWithWeights = TFile::Open("datafileLambda_TAUmin200fs_max2200fs_Mmin2216_max2356_CutIPCHI2lt3_withWeights.root","RECREATE") ;
+   TFile *dsWithWeights = TFile::Open("DataSet_Lambda_TAUmin200fs_max2200fs_Mmin2216_max2356_CutIPCHI2lt3_withWeights.root","RECREATE") ;
   ds->Write() ;
   dsWithWeights->Close() ;
   cout<<endl<<"  Dataset type file (datafileLambda_TAUmin200fs_max2200fs_Mmin2216_max2356_CutIPCHI2lt3_withWeights.root) created in current directory..."<<endl ;
- 
+  */
+
   // Save TTree with sWeights
-  TFile treefile("sTree.root", "recreate") ;
-   RooTreeDataStore sTree("sTree", "sTree", *ds->get(0), *ds->store()) ;
-  cout<<"test1"<<endl;    
+  //TFile treefile("sTree.root", "recreate") ;
+  TFile treefile("~/Documents/uni/LHCb_CharmSummerProj/learning_root/sTree_NoIPCHI2Cut.root", "recreate") ;
+  RooTreeDataStore sTree("sTree", "sTree", *ds->get(0), *ds->store()) ;
   TTree& mystree = sTree.tree() ;
   mystree.SetBranchStatus("Lambda_cplus_M", 0) ; // you don't want to save the mass variables again.
   mystree.Write() ;
   treefile.Close() ;
-  cout<<endl<<"  TTree file (sTree.root) created in current directory..."<<endl ;
+  cout<<endl<<"TTree file created..."<<endl ;
 
+  // Check the values of the yields and the 'yields' from the sWeight are the same
+  cout<<endl<<"Yield of signal is: "<<nSignal.getVal()<<"; from sWeights it is: "
+      <<sDataM->GetYieldFromSWeight("nSignal")<<endl ;
+  cout<<"Yield of background is: "<<nBkg.getVal()<<"; from sWeights it is: "
+      <<sDataM->GetYieldFromSWeight("nBkg")<<endl ;
+  cout<<"^ These should match..."<<endl<<endl ;
+
+
+  cout<<"nSignal + nBkg = "<<nSignal.getVal()<<" + "<<nBkg.getVal()<<" = "<<nSignal.getVal()+nBkg.getVal()<<endl;
+  cout<<"^ This should match the number of events (below): "<<endl ;
+  ds->Print() ;
 
 
   // VISUAL CHECK: check the fit is correct, plot the fitted model on the data
