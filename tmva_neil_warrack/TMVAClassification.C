@@ -126,7 +126,7 @@ void TMVAClassification( TString myMethodList = "" )
    // 
    // --- Boosted Decision Trees
    Use["BDT"]             = 1; // uses Adaptive Boost
-   Use["BDTG"]            = 1; // uses Gradient Boost
+   Use["BDTG"]            = 0; // uses Gradient Boost
    Use["BDTB"]            = 0; // uses Bagging
    Use["BDTD"]            = 0; // decorrelation + Adaptive Boost
    Use["BDTF"]            = 0; // allow usage of fisher discriminant for node splitting 
@@ -161,7 +161,7 @@ void TMVAClassification( TString myMethodList = "" )
    // --- Here the preparation phase begins
 
    // Create a ROOT output file where TMVA will store ntuples, histograms, etc.
-   TString outfileName( "TMVA.root" );
+   TString outfileName( "TMVAoutput6_7_16.root" );
    TFile* outputFile = TFile::Open( outfileName, "RECREATE" );
 
    // Create the factory object. Later you can choose the methods
@@ -189,9 +189,19 @@ void TMVAClassification( TString myMethodList = "" )
    //factory->AddVariable( "Lambdac_sph1", 'F' );
    //factory->AddVariable( "Lambdac_sh1h2", 'F' );
    //factory->AddVariable( "Lambdac_sph2", 'F' );
-   factory->AddVariable( "proton_LcRest_costheta", 'F' );
-   factory->AddVariable( "proton_LcRest_cosphi", 'F' );
-   factory->AddVariable( "Lambdac_LcRest_thetah1h2", 'F' );
+   //factory->AddVariable( "proton_LcRest_costheta", 'F' );
+   //factory->AddVariable( "proton_LcRest_cosphi", 'F' );
+   //factory->AddVariable( "Lambdac_LcRest_thetah1h2", 'F' );
+   factory->AddVariable( "pplus_PIDp - pplus_PIDK", 'F' ); // How much more likely the proton candidate 
+                                                           // is to be a proton than a kaon.
+   factory->AddVariable( "piplus_TRACK_GhostProb", 'F' );  // Probability that they're actually real
+                                                           // tracks, and not just random combinations 
+                                                           // of hits in the detector.
+   factory->AddVariable( "pplus_TRACK_GhostProb", 'F' );
+   factory->AddVariable( "Kminus_TRACK_GhostProb", 'F' );
+   factory->AddVariable( "Lambda_cplus_ENDVERTEX_CHI2", 'F' ); // the quality of the Lc decay vertex 
+                                                               // (how closely the three daughter tracks 
+                                                               // intersect)
    factory->AddVariable( "Lambda_cplus_P", 'F' );
    factory->AddVariable( "Lambda_cplus_PT", 'F' );
    factory->AddVariable( "Kminus_P", 'F' );
@@ -228,7 +238,7 @@ void TMVAClassification( TString myMethodList = "" )
    // (it is also possible to use ASCII format as input -> see TMVA Users Guide)
    //TString fname = "/nfs/lhcb/malexander01/charm/baryon-lifetimes-2015/data/run-II-data/turbo_2015_data_wAngles_wBDTGWeights.root";
    //TString fname = "~/Documents/uni/LHCb_CharmSummerProj/data/turbo_2015_data.root";
-   TString fname = "~/Documents/uni/LHCb_CharmSummerProj/Gedcode/baryon-lifetimes-2015/data/run-II-data/turbo_2015_data_wAngles.root";
+   TString fname = "~/Documents/uni/LHCb_CharmSummerProj/learning_root/mergedOutpuForTMVA.root";
    //TString fname = "~/Documents/uni/LHCb_CharmSummerProj/Gedcode/baryon-lifetimes-2015/data/run-II-data/datafileLambda_TAUmin200fs_max2200fs_Mmin2216_max2356_CutIPCHI2lt3.root";
    //TString fname = "/afs/phas.gla.ac.uk/user/n/nwarrack/public_ppe/myLHCb/Gedcode/LHCb_CharmedHadrons/data/turbo_2015_data.root";
    
@@ -240,18 +250,15 @@ void TMVAClassification( TString myMethodList = "" )
    std::cout << "--- TMVAClassification       : Using input file: " << input->GetName() << std::endl;
    
    // --- Register the training and test trees
-   cout<<"MARK1"<<endl;
    TTree *signal     = (TTree*)input->Get("DecayTree");
-    cout<<"MARK2"<<endl;
    TTree *background = (TTree*)input->Get("DecayTree");
    
    // global event weights per tree (see below for setting event-wise weights)
    Double_t signalWeight     = 1.0;
    Double_t backgroundWeight = 1.0;
-   cout<<"MARK2.2"<<endl;   
+
    // You can add an arbitrary number of signal or background trees
    factory->AddSignalTree( signal, signalWeight);
-   cout<<"MARK3"<<endl;   
    factory->AddBackgroundTree( background, backgroundWeight );
    
    // To give different trees for training and testing, do as follows:
@@ -296,7 +303,7 @@ void TMVAClassification( TString myMethodList = "" )
    // Set individual event weights (the variables must exist in the original TTree)
    //    for signal    : factory->SetSignalWeightExpression    ("weight1*weight2");
    //    for background: factory->SetBackgroundWeightExpression("weight1*weight2");
-   factory->SetSignalWeightExpression    ("nSig_sw");
+   factory->SetSignalWeightExpression    ("nSignal_sw");
    factory->SetBackgroundWeightExpression( "nBkg_sw" );
 
    // Apply additional cuts on the signal and background samples (can be different)
