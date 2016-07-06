@@ -161,7 +161,7 @@ void TMVAClassification( TString myMethodList = "" )
    // --- Here the preparation phase begins
 
    // Create a ROOT output file where TMVA will store ntuples, histograms, etc.
-   TString outfileName( "TMVAoutput6_7_16.root" );
+   TString outfileName( "TMVAoutput6_7_16_02.root" );
    TFile* outputFile = TFile::Open( outfileName, "RECREATE" );
 
    // Create the factory object. Later you can choose the methods
@@ -192,13 +192,13 @@ void TMVAClassification( TString myMethodList = "" )
    //factory->AddVariable( "proton_LcRest_costheta", 'F' );
    //factory->AddVariable( "proton_LcRest_cosphi", 'F' );
    //factory->AddVariable( "Lambdac_LcRest_thetah1h2", 'F' );
-   factory->AddVariable( "pplus_PIDp - pplus_PIDK", 'F' ); // How much more likely the proton candidate 
+   //factory->AddVariable( "pplus_PIDp - pplus_PIDK", 'F' ); // How much more likely the proton candidate 
                                                            // is to be a proton than a kaon.
-   factory->AddVariable( "piplus_TRACK_GhostProb", 'F' );  // Probability that they're actually real
+   //factory->AddVariable( "piplus_TRACK_GhostProb", 'F' );  // Probability that they're actually real
                                                            // tracks, and not just random combinations 
                                                            // of hits in the detector.
-   factory->AddVariable( "pplus_TRACK_GhostProb", 'F' );
-   factory->AddVariable( "Kminus_TRACK_GhostProb", 'F' );
+   //factory->AddVariable( "pplus_TRACK_GhostProb", 'F' );
+   //factory->AddVariable( "Kminus_TRACK_GhostProb", 'F' );
    factory->AddVariable( "Lambda_cplus_ENDVERTEX_CHI2", 'F' ); // the quality of the Lc decay vertex 
                                                                // (how closely the three daughter tracks 
                                                                // intersect)
