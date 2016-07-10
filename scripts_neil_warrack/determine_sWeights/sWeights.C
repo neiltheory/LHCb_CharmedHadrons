@@ -18,16 +18,17 @@ using namespace std ;
 using namespace RooFit ;
 
 
-// Script opens a previously made ROOT file which contains a dataset type object and calculates 'sWeights'.
-// sWeights are then saved to a dataset type ROOT file AND also to a TTree type ROOT file, along with their
+// Script opens a previously made ROOT file which contains a dataset type object (which is a reduced version 
+// of the full data, reduced but applying specific cuts in specfic variables) and calculates 'sWeights'.
+// sWeights are then saved to a 'dataset' .root file AND/OR to a TTree type ROOT file, along with their
 // original info.
 
 
 void sWeigher() {
 
-  TFile *fullFile = TFile::Open("~/Documents/uni/LHCb_CharmSummerProj/learning_root/turbo_2015_data.root") ;
+  TFile *fullFile = TFile::Open("~/Documents/uni/LHCb_CharmSummerProj/learning_root/turbo_2015_data.root") ; // Opens full data.
   TTree* mytree = (TTree*) fullFile->Get("Lambda_cToKppiTuple/DecayTree;1") ;  
-  TFile *datafile = TFile::Open("~/Documents/uni/LHCb_CharmSummerProj/learning_root/DataSetLambda_TAUmin0002_max0022.root") ;
+  TFile *datafile = TFile::Open("~/Documents/uni/LHCb_CharmSummerProj/learning_root/turbo_M_TAU_cut01.root") ; // opens 'reduced' data.
   //TFile *datafile = TFile::Open("~/Documents/uni/LHCb_CharmSummerProj/Gedcode/baryon-lifetimes-2015/data/run-II-data/datafileLambda_TAUmin200fs_max2200fs_Mmin2216_max2356_CutIPCHI2lt3.root") ; 
 
 
@@ -36,8 +37,7 @@ void sWeigher() {
 
 
   // Define TAU variable, get limits.
-  //RooRealVar Lambda_cplus_TAU("Lambda_cplus_TAU","Lambda_cplus_TAU",0.0002 ,0.0022 ,"ns") ;  //real range of interest is [0.00025, 0.002], this is defined later.
-  RooRealVar Lambda_cplus_TAU("Lambda_cplus_TAU","Lambda_cplus_TAU",0.00025 ,0.002 ,"ns") ;  //real range of interest is [0.00025, 0.002], this is defined later.
+  RooRealVar Lambda_cplus_TAU("Lambda_cplus_TAU","Lambda_cplus_TAU",0.00025 ,0.002 ,"ns") ; 
   double highestTAU;
   double lowestTAU;
   ds->RooAbsData::getRange(Lambda_cplus_TAU, lowestTAU, highestTAU);
@@ -49,7 +49,7 @@ void sWeigher() {
   ds->RooAbsData::getRange(Lambda_cplus_M, lowestM, highestM) ;
   
   // Define IPCHI2 variable
-  RooRealVar Lambda_cplus_IPCHI2_OWNPV("Lambda_cplus_IPCHI2_OWNPV","Lambda_cplus_IPCHI2_OWNPV",-100 ,100) ; 
+  //RooRealVar Lambda_cplus_IPCHI2_OWNPV("Lambda_cplus_IPCHI2_OWNPV","Lambda_cplus_IPCHI2_OWNPV",-100 ,100) ; 
 
 
   // Build combined double Gaussian PDF; "gaussComb". 
@@ -94,12 +94,13 @@ void sWeigher() {
   nFrac.setConstant() ;
   expoPar.setConstant() ;
   
-  RooMsgService::instance().setSilentMode(true);
+  //RooMsgService::instance().setSilentMode(true);
 
   // Create and record sWeights
   RooStats::SPlot* sDataM = new RooStats::SPlot("sData", "An SPlot", *ds, &model, RooArgList(nSignal, nBkg)) ;
 
  /*
+//To Check...
   for (Int_t i=90; i < 100; i++){
     cout << "nSignal: "<<sDataM->GetSWeight(i,"nSignal")
 	 << ", nBkg: "<<sDataM->GetSWeight(i,"nBkg")
@@ -116,9 +117,9 @@ void sWeigher() {
   cout<<endl<<"  Dataset type file (datafileLambda_TAUmin200fs_max2200fs_Mmin2216_max2356_CutIPCHI2lt3_withWeights.root) created in current directory..."<<endl ;
   */
 
-  // Save TTree with sWeights
+  // Save OUTPUT TTree with sWeights
   //TFile treefile("sTree.root", "recreate") ;
-  TFile treefile("~/Documents/uni/LHCb_CharmSummerProj/learning_root/sTree_NoIPCHI2Cut.root", "recreate") ;
+  TFile treefile("~/Documents/uni/LHCb_CharmSummerProj/learning_root/sWeightsTree_M_TAU_cut01.root", "recreate") ;
   RooTreeDataStore sTree("sTree", "sTree", *ds->get(0), *ds->store()) ;
   TTree& mystree = sTree.tree() ;
   mystree.SetBranchStatus("Lambda_cplus_M", 0) ; // you don't want to save the mass variables again.
@@ -132,13 +133,25 @@ void sWeigher() {
   cout<<"Yield of background is: "<<nBkg.getVal()<<"; from sWeights it is: "
       <<sDataM->GetYieldFromSWeight("nBkg")<<endl ;
   cout<<"^ These should match..."<<endl<<endl ;
-
-
   cout<<"nSignal + nBkg = "<<nSignal.getVal()<<" + "<<nBkg.getVal()<<" = "<<nSignal.getVal()+nBkg.getVal()<<endl;
   cout<<"^ This should match the number of events (below): "<<endl ;
   ds->Print() ;
 
+  cout<<"========== FIT INFO =========="<<endl ;
+  cout<<"  Double Gaussian fit parameters to full data (signal + background):"<<endl;
+  cout<<gausMean1<<endl ;
+  cout<<gausMean2<<endl ;
+  cout<<sigma1<<endl ;
+  cout<<sigma2<<endl ;
+  cout<<nFrac<<endl ;
+  cout<<"  Exponential fit parameters to full data (signal + background):"<<endl;
+  cout<<expoPar<<endl<<endl ;
 
+
+  cout<<"highestM = "<<highestM<<endl;
+  cout<<"lowestM = "<<lowestM<<endl;
+  cout<<"highestTAU = "<<highestTAU<<endl;
+  cout<<"lowestTAU = "<<lowestTAU<<endl;
   // VISUAL CHECK: check the fit is correct, plot the fitted model on the data
   /*
   // Plot =================================================

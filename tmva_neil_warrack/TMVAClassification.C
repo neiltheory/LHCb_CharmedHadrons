@@ -234,6 +234,7 @@ void TMVAClassification( TString myMethodList = "" )
    factory->AddSpectator( "spec2 := var1*3",  "Spectator 2", "units", 'F' );
    */
  
+   // INPUT FILE: 
    // Read training and test data
    // (it is also possible to use ASCII format as input -> see TMVA Users Guide)
    //TString fname = "/nfs/lhcb/malexander01/charm/baryon-lifetimes-2015/data/run-II-data/turbo_2015_data_wAngles_wBDTGWeights.root";

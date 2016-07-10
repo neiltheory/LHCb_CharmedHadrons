@@ -27,11 +27,11 @@ void stripper() {
 
   // Create new 'stripped' file
   //TFile newfile("~/Documents/uni/LHCb_CharmSummerProj/learning_root/strippedToFitData.root", "recreate") ;
-  TFile newfile("~/Documents/uni/LHCb_CharmSummerProj/learning_root/strippedToFitData_wAngVars.root", "recreate") ;
+  TFile newfile("~/Documents/uni/LHCb_CharmSummerProj/learning_root/strippedToFitData_M_TAU_cut01_wAngVars.root", "recreate") ;
   
 
   // Strip the TTree acording to the appropriate cut
-  TTree* fitdatatree = originaltree->CopyTree("0.0002 < Lambda_cplus_TAU && Lambda_cplus_TAU < 0.0022 && 2216 < Lambda_cplus_M && Lambda_cplus_M < 2356") ;
+  TTree* fitdatatree = originaltree->CopyTree("0.00025 < Lambda_cplus_TAU && Lambda_cplus_TAU < 0.002 && 2216 < Lambda_cplus_M && Lambda_cplus_M < 2356") ;
  
 
   // Write file
@@ -43,7 +43,7 @@ void stripper() {
   cout<<"To merge this reduced/stripped file with another file containing the same entries (but presumably with different variables) do:  python mergetrees.py <output file name> <input file name 1> <input TTreename 1> <input file name 2> <input TTree name 2>"<<endl<<endl ;
 
   cout<<"e.g."<<endl;
-  cout<<"python mergetrees.py strippedToFitData_wAngVars_wSWeights.root ~/Documents/uni/LHCb_CharmSummerProj/learning_root/strippedToFitData_wAngVars.root DecayTree ~/Documents/uni/LHCb_CharmSummerProj/learning_root/sWeightsTree.root sTree"<<endl;
+  cout<<"python mergetrees.py ~/Documents/uni/LHCb_CharmSummerProj/learning_root/strippedToFitData_M_TAU_cut01_wAngVars_wSWeights.root ~/Documents/uni/LHCb_CharmSummerProj/learning_root/strippedToFitData_wAngVars.root DecayTree ~/Documents/uni/LHCb_CharmSummerProj/learning_root/sWeightsTree_M_TAU_cut01.root sTree"<<endl;
   cout<<"========================================================="<<endl<<endl<<endl ;
 
 
