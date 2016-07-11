@@ -161,7 +161,7 @@ void TMVAClassification( TString myMethodList = "" )
    // --- Here the preparation phase begins
 
    // Create a ROOT output file where TMVA will store ntuples, histograms, etc.
-   TString outfileName( "TMVAoutput7_7_16_01.root" );
+   TString outfileName( "TMVA.root" );
    TFile* outputFile = TFile::Open( outfileName, "RECREATE" );
 
    // Create the factory object. Later you can choose the methods
@@ -212,9 +212,9 @@ void TMVAClassification( TString myMethodList = "" )
    factory->AddVariable( "piplus_PIDK", 'F' );
    factory->AddVariable( "pplus_PIDK", 'F' );
    factory->AddVariable( "pplus_PIDp", 'F' );
-   //factory->AddVariable( "DLL_pK := pplus_PIDp - pplus_PIDK", 'F' ); // How much more likely the proton candidate 
-                                                                     // is to be a proton than a kaon.
-
+   factory->AddVariable( "myVar := pplus_PIDp - pplus_PIDK", 'F' ) ;
+   //factory->AddVariable( "pplus_PIDp - pplus_PIDK", 'F' ) ; // How much more likely the proton candidate 
+                                                            // is to be a proton than a kaon.
    /* 
    factory->AddVariable( "myvar1 := var1+var2", 'F' );
    factory->AddVariable( "myvar2 := var1-var2", "Expression 2", "", 'F' );
@@ -239,7 +239,7 @@ void TMVAClassification( TString myMethodList = "" )
    // (it is also possible to use ASCII format as input -> see TMVA Users Guide)
    //TString fname = "/nfs/lhcb/malexander01/charm/baryon-lifetimes-2015/data/run-II-data/turbo_2015_data_wAngles_wBDTGWeights.root";
    //TString fname = "~/Documents/uni/LHCb_CharmSummerProj/data/turbo_2015_data.root";
-   TString fname = "~/Documents/uni/LHCb_CharmSummerProj/learning_root/mergedOutpuForTMVA.root";
+   TString fname = "~/Documents/uni/LHCb_CharmSummerProj/learning_root/strippedToFitData_M_TAU_cut01_wAngVars_wSWeights01.root";
    //TString fname = "~/Documents/uni/LHCb_CharmSummerProj/Gedcode/baryon-lifetimes-2015/data/run-II-data/datafileLambda_TAUmin200fs_max2200fs_Mmin2216_max2356_CutIPCHI2lt3.root";
    //TString fname = "/afs/phas.gla.ac.uk/user/n/nwarrack/public_ppe/myLHCb/Gedcode/LHCb_CharmedHadrons/data/turbo_2015_data.root";
    
