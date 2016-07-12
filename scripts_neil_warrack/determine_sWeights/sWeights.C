@@ -26,10 +26,13 @@ using namespace RooFit ;
 
 void sWeigher() {
 
-  TFile *fullFile = TFile::Open("~/Documents/uni/LHCb_CharmSummerProj/learning_root/turbo_2015_data.root") ; // Opens full data.
+  //TFile *fullFile = TFile::Open("~/Documents/uni/LHCb_CharmSummerProj/learning_root/turbo_2015_data.root") ; // Opens full data.
+  TFile *fullFile = TFile::Open("/afs/phas.gla.ac.uk/user/n/nwarrack/public_ppe/myLHCb/Gedcode/LHCb_CharmedHadrons/data/run-II-data/turbo_2015_data.root") ; 
+
   TTree* mytree = (TTree*) fullFile->Get("Lambda_cToKppiTuple/DecayTree;1") ;  
-  TFile *datafile = TFile::Open("~/Documents/uni/LHCb_CharmSummerProj/learning_root/turbo_M_TAU_cut01.root") ; // opens 'reduced' data.
-  //TFile *datafile = TFile::Open("~/Documents/uni/LHCb_CharmSummerProj/Gedcode/baryon-lifetimes-2015/data/run-II-data/datafileLambda_TAUmin200fs_max2200fs_Mmin2216_max2356_CutIPCHI2lt3.root") ; 
+
+  //TFile *datafile = TFile::Open("~/Documents/uni/LHCb_CharmSummerProj/learning_root/turbo_M_TAU_cut01.root") ; // opens 'reduced' data.
+  TFile *datafile = TFile::Open("/afs/phas.gla.ac.uk/user/n/nwarrack/public_ppe/myLHCb/Gedcode/LHCb_CharmedHadrons/data/turbo_M_TAU_cut01.root") ;  
 
 
   // Define dataset
@@ -119,7 +122,8 @@ void sWeigher() {
 
   // Save OUTPUT TTree with sWeights
   //TFile treefile("sTree.root", "recreate") ;
-  TFile treefile("~/Documents/uni/LHCb_CharmSummerProj/learning_root/sWeightsTree_M_TAU_cut01.root", "recreate") ;
+  //TFile treefile("~/Documents/uni/LHCb_CharmSummerProj/learning_root/sWeightsTree_M_TAU_cut01.root", "recreate") ;
+  TFile treefile("/afs/phas.gla.ac.uk/user/n/nwarrack/public_ppe/myLHCb/Gedcode/LHCb_CharmedHadrons/data/sWeightsTree_M_TAU_cut01.root", "recreate") ;
   RooTreeDataStore sTree("sTree", "sTree", *ds->get(0), *ds->store()) ;
   TTree& mystree = sTree.tree() ;
   mystree.SetBranchStatus("Lambda_cplus_M", 0) ; // you don't want to save the mass variables again.
