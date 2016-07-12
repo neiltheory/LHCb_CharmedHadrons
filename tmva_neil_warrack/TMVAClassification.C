@@ -24,7 +24,8 @@
  * Launch the GUI via the command:                                                *
  *                                                                                *
  *    root -l ./TMVAGui.C                                                         *
- *                                                                                *
+ *    OR                                                                          *
+ *    $ROOTSYS/tmva/test/TMVAGui.C                                                *
  **********************************************************************************/
 
 #include <cstdlib>
@@ -160,7 +161,7 @@ void TMVAClassification( TString myMethodList = "" )
    // --- Here the preparation phase begins
 
    // Create a ROOT output file where TMVA will store ntuples, histograms, etc.
-   TString outfileName( "TMVA2.root" );
+   TString outfileName( "TMVA.root" );
    TFile* outputFile = TFile::Open( outfileName, "RECREATE" );
 
    // Create the factory object. Later you can choose the methods
@@ -185,12 +186,20 @@ void TMVAClassification( TString myMethodList = "" )
    // note that you may also use variable expressions, such as: "3*var1/var2*abs(var3)"
    // [all types of expressions that can also be parsed by TTree::Draw( "expression" )]
 
-   factory->AddVariable( "Lambdac_sph1", 'F' );
-   factory->AddVariable( "Lambdac_sh1h2", 'F' );
-   factory->AddVariable( "Lambdac_sph2", 'F' );
+   //factory->AddVariable( "Lambdac_sph1", 'F' );
+   //factory->AddVariable( "Lambdac_sh1h2", 'F' );
+   //factory->AddVariable( "Lambdac_sph2", 'F' );
    factory->AddVariable( "proton_LcRest_costheta", 'F' );
    factory->AddVariable( "proton_LcRest_cosphi", 'F' );
    factory->AddVariable( "Lambdac_LcRest_thetah1h2", 'F' );
+   factory->AddVariable( "piplus_TRACK_GhostProb", 'F' );  // Probability that they're actually real
+                                                           // tracks, and not just random combinations 
+                                                           // of hits in the detector.
+   factory->AddVariable( "pplus_TRACK_GhostProb", 'F' );
+   factory->AddVariable( "Kminus_TRACK_GhostProb", 'F' );
+   factory->AddVariable( "Lambda_cplus_ENDVERTEX_CHI2", 'F' ); // the quality of the Lc decay vertex 
+                                                               // (how closely the three daughter tracks 
+                                                               // intersect)
    factory->AddVariable( "Lambda_cplus_P", 'F' );
    factory->AddVariable( "Lambda_cplus_PT", 'F' );
    factory->AddVariable( "Kminus_P", 'F' );
@@ -203,7 +212,9 @@ void TMVAClassification( TString myMethodList = "" )
    factory->AddVariable( "piplus_PIDK", 'F' );
    factory->AddVariable( "pplus_PIDK", 'F' );
    factory->AddVariable( "pplus_PIDp", 'F' );
-
+   //factory->AddVariable( "myVar := pplus_PIDp - pplus_PIDK", 'F' ) ;
+   factory->AddVariable( "pplus_PIDp - pplus_PIDK", 'F' ) ; // How much more likely the proton candidate 
+                                                            // is to be a proton than a kaon.
    /* 
    factory->AddVariable( "myvar1 := var1+var2", 'F' );
    factory->AddVariable( "myvar2 := var1-var2", "Expression 2", "", 'F' );
@@ -223,11 +234,14 @@ void TMVAClassification( TString myMethodList = "" )
    factory->AddSpectator( "spec2 := var1*3",  "Spectator 2", "units", 'F' );
    */
  
+   // INPUT FILE: 
    // Read training and test data
    // (it is also possible to use ASCII format as input -> see TMVA Users Guide)
    //TString fname = "/nfs/lhcb/malexander01/charm/baryon-lifetimes-2015/data/run-II-data/turbo_2015_data_wAngles_wBDTGWeights.root";
    //TString fname = "~/Documents/uni/LHCb_CharmSummerProj/data/turbo_2015_data.root";
-   TString fname = "/afs/phas.gla.ac.uk/user/n/nwarrack/public_ppe/myLHCb/Gedcode/LHCb_CharmedHadrons/data/turbo_2015_data.root";
+   TString fname = "/afs/phas.gla.ac.uk/user/n/nwarrack/public_ppe/myLHCb/Gedcode/LHCb_CharmedHadrons/data/strippedToFitData_M_TAU_cut01_wAngVars_wSWeights01.root";
+   //TString fname = "~/Documents/uni/LHCb_CharmSummerProj/Gedcode/baryon-lifetimes-2015/data/run-II-data/datafileLambda_TAUmin200fs_max2200fs_Mmin2216_max2356_CutIPCHI2lt3.root";
+   //TString fname = "/afs/phas.gla.ac.uk/user/n/nwarrack/public_ppe/myLHCb/Gedcode/LHCb_CharmedHadrons/data/turbo_2015_data.root";
    
    if (gSystem->AccessPathName( fname ))  // file does not exist in local directory
       gSystem->Exec("curl -O http://root.cern.ch/files/tmva_class_example.root");
@@ -237,16 +251,15 @@ void TMVAClassification( TString myMethodList = "" )
    std::cout << "--- TMVAClassification       : Using input file: " << input->GetName() << std::endl;
    
    // --- Register the training and test trees
-
    TTree *signal     = (TTree*)input->Get("DecayTree");
    TTree *background = (TTree*)input->Get("DecayTree");
    
    // global event weights per tree (see below for setting event-wise weights)
    Double_t signalWeight     = 1.0;
    Double_t backgroundWeight = 1.0;
-   
+
    // You can add an arbitrary number of signal or background trees
-   factory->AddSignalTree    ( signal,     signalWeight     );
+   factory->AddSignalTree( signal, signalWeight);
    factory->AddBackgroundTree( background, backgroundWeight );
    
    // To give different trees for training and testing, do as follows:
@@ -291,7 +304,7 @@ void TMVAClassification( TString myMethodList = "" )
    // Set individual event weights (the variables must exist in the original TTree)
    //    for signal    : factory->SetSignalWeightExpression    ("weight1*weight2");
    //    for background: factory->SetBackgroundWeightExpression("weight1*weight2");
-   factory->SetSignalWeightExpression    ("nSig_sw");
+   factory->SetSignalWeightExpression    ("nSignal_sw");
    factory->SetBackgroundWeightExpression( "nBkg_sw" );
 
    // Apply additional cuts on the signal and background samples (can be different)
@@ -516,9 +529,12 @@ void TMVAClassification( TString myMethodList = "" )
 
    std::cout << "==> Wrote root file: " << outputFile->GetName() << std::endl;
    std::cout << "==> TMVAClassification is done!" << std::endl;
+   std::cout << "==> LAUNCH GUI WITH:  root -l $ROOTSYS/tmva/test/TMVAGui.C" << std::endl;
 
    delete factory;
 
    // Launch the GUI for the root macros
-   if (!gROOT->IsBatch()) TMVAGui( outfileName );
+   //if (!gROOT->IsBatch()) TMVAGui( outfileName );
+   if (!gROOT->IsBatch()) TMVAGui( _file0->GetName() ) ;
+   
 }

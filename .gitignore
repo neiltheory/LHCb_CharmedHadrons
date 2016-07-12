@@ -1,5 +1,6 @@
 *~
 gangadir
 *.root
+*.pdf
 tmva_neil_warrack/plots/
 tmva_neil_warrack/weights/
