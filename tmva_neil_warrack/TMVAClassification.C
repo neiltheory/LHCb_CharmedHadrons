@@ -529,9 +529,12 @@ void TMVAClassification( TString myMethodList = "" )
 
    std::cout << "==> Wrote root file: " << outputFile->GetName() << std::endl;
    std::cout << "==> TMVAClassification is done!" << std::endl;
+   std::cout << "==> LAUNCH GUI WITH:  root -l $ROOTSYS/tmva/test/TMVAGui.C" << std::endl;
 
    delete factory;
 
    // Launch the GUI for the root macros
-   if (!gROOT->IsBatch()) TMVAGui( outfileName );
+   //if (!gROOT->IsBatch()) TMVAGui( outfileName );
+   if (!gROOT->IsBatch()) TMVAGui( _file0->GetName() ) ;
+   
 }
