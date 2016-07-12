@@ -126,7 +126,7 @@ void TMVAClassification( TString myMethodList = "" )
    // 
    // --- Boosted Decision Trees
    Use["BDT"]             = 1; // uses Adaptive Boost
-   Use["BDTG"]            = 0; // uses Gradient Boost
+   Use["BDTG"]            = 1; // uses Gradient Boost
    Use["BDTB"]            = 0; // uses Bagging
    Use["BDTD"]            = 0; // decorrelation + Adaptive Boost
    Use["BDTF"]            = 0; // allow usage of fisher discriminant for node splitting 
@@ -189,9 +189,9 @@ void TMVAClassification( TString myMethodList = "" )
    //factory->AddVariable( "Lambdac_sph1", 'F' );
    //factory->AddVariable( "Lambdac_sh1h2", 'F' );
    //factory->AddVariable( "Lambdac_sph2", 'F' );
-   //factory->AddVariable( "proton_LcRest_costheta", 'F' );
-   //factory->AddVariable( "proton_LcRest_cosphi", 'F' );
-   //factory->AddVariable( "Lambdac_LcRest_thetah1h2", 'F' );
+   factory->AddVariable( "proton_LcRest_costheta", 'F' );
+   factory->AddVariable( "proton_LcRest_cosphi", 'F' );
+   factory->AddVariable( "Lambdac_LcRest_thetah1h2", 'F' );
    factory->AddVariable( "piplus_TRACK_GhostProb", 'F' );  // Probability that they're actually real
                                                            // tracks, and not just random combinations 
                                                            // of hits in the detector.
@@ -212,8 +212,8 @@ void TMVAClassification( TString myMethodList = "" )
    factory->AddVariable( "piplus_PIDK", 'F' );
    factory->AddVariable( "pplus_PIDK", 'F' );
    factory->AddVariable( "pplus_PIDp", 'F' );
-   factory->AddVariable( "myVar := pplus_PIDp - pplus_PIDK", 'F' ) ;
-   //factory->AddVariable( "pplus_PIDp - pplus_PIDK", 'F' ) ; // How much more likely the proton candidate 
+   //factory->AddVariable( "myVar := pplus_PIDp - pplus_PIDK", 'F' ) ;
+   factory->AddVariable( "pplus_PIDp - pplus_PIDK", 'F' ) ; // How much more likely the proton candidate 
                                                             // is to be a proton than a kaon.
    /* 
    factory->AddVariable( "myvar1 := var1+var2", 'F' );
@@ -239,7 +239,7 @@ void TMVAClassification( TString myMethodList = "" )
    // (it is also possible to use ASCII format as input -> see TMVA Users Guide)
    //TString fname = "/nfs/lhcb/malexander01/charm/baryon-lifetimes-2015/data/run-II-data/turbo_2015_data_wAngles_wBDTGWeights.root";
    //TString fname = "~/Documents/uni/LHCb_CharmSummerProj/data/turbo_2015_data.root";
-   TString fname = "~/Documents/uni/LHCb_CharmSummerProj/learning_root/strippedToFitData_M_TAU_cut01_wAngVars_wSWeights01.root";
+   TString fname = "/afs/phas.gla.ac.uk/user/n/nwarrack/public_ppe/myLHCb/Gedcode/LHCb_CharmedHadrons/data/strippedToFitData_M_TAU_cut01_wAngVars_wSWeights01.root";
    //TString fname = "~/Documents/uni/LHCb_CharmSummerProj/Gedcode/baryon-lifetimes-2015/data/run-II-data/datafileLambda_TAUmin200fs_max2200fs_Mmin2216_max2356_CutIPCHI2lt3.root";
    //TString fname = "/afs/phas.gla.ac.uk/user/n/nwarrack/public_ppe/myLHCb/Gedcode/LHCb_CharmedHadrons/data/turbo_2015_data.root";
    
