@@ -44,7 +44,7 @@ void fitFunc() {
 
   // Define dataset
   //RooDataSet* ds = (RooDataSet*)datafile->Get("ds") ;
-  RooDataSet ds("ds","ds",RooArgSet(Lambda_cplus_M,Lambda_cplus_IPCHI2_OWNPV,BDTG,Lambda_cplus_TAU),Import(*mytree),Cut("(BDTG>0.091)&&(Lambda_cplus_IPCHI2_OWNPV<3)")) ;
+  RooDataSet ds("ds","ds",RooArgSet(Lambda_cplus_M,Lambda_cplus_IPCHI2_OWNPV,BDTG,Lambda_cplus_TAU),Import(*mytree),Cut("(BDTG>0.1506)&&(Lambda_cplus_IPCHI2_OWNPV<3)")) ;
 
 
   //double highestTAU;
